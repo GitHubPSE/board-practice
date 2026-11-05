@@ -1,0 +1,44 @@
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "content": "컨텐츠"
+}
+###
+GET http://localhost:3000/posts
+###
+GET http://localhost:3000/posts/1
+###
+DELETE http://localhost:3000/posts/1
+###
+PATCH http://localhost:3000/posts/6
+Content-Type: application/json
+
+{
+  "title": "수정 제목",
+  "content": "수정 내용"
+}
+### 제목만 → 내용은 "수정 내용" 그대로 남아야 함
+PATCH http://localhost:3000/posts/6
+Content-Type: application/json
+
+{
+  "title": "제목만 바꿈"
+}
+
+### 없는 글 → 404
+PATCH http://localhost:3000/posts/9999
+Content-Type: application/json
+
+{
+  "title": "바뀐 제목"
+}
+
+### 빈 제목 → 400
+PATCH http://localhost:3000/posts/6
+Content-Type: application/json
+
+{
+  "title": ""
+}
