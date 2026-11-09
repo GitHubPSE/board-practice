@@ -1,44 +1,80 @@
-POST http://localhost:3000/posts
+#POST http://localhost:3001/posts
+#Content-Type: application/json
+#
+#{
+#  "title": "제목",
+#  "content": "컨텐츠"
+#}
+####
+#GET http://localhost:3001/posts
+####
+#GET http://localhost:3001/posts/1
+####
+#DELETE http://localhost:3001/posts/1
+####
+#PATCH http://localhost:3001/posts/6
+#Content-Type: application/json
+#
+#{
+#  "title": "수정 제목",
+#  "content": "수정 내용"
+#}git remote remove origin
+#### 제목만 → 내용은 "수정 내용" 그대로 남아야 함
+#PATCH http://localhost:3001/posts/6
+#Content-Type: application/json
+#
+#{
+#  "title": "제목만 바꿈"
+#}
+#
+#### 없는 글 → 404
+#PATCH http://localhost:3001/posts/9999
+#Content-Type: application/json
+#
+#{
+#  "title": "바뀐 제목"
+#}
+#
+#### 빈 제목 → 400
+#PATCH http://localhost:3001/posts/6
+#Content-Type: application/json
+#
+#{
+#  "title": ""
+#}
+
+### 가입 성공 → 201, 응답에 password 없어야 함
+POST http://localhost:3001/users/signup
 Content-Type: application/json
 
 {
-  "title": "제목",
-  "content": "컨텐츠"
+  "email": "test@test.com",
+  "password": "12345678"
 }
-###
-GET http://localhost:3000/posts
-###
-GET http://localhost:3000/posts/1
-###
-DELETE http://localhost:3000/posts/1
-###
-PATCH http://localhost:3000/posts/6
+
+### 같은 이메일 다시 → 409
+POST http://localhost:3001/users/signup
 Content-Type: application/json
 
 {
-  "title": "수정 제목",
-  "content": "수정 내용"
-}
-### 제목만 → 내용은 "수정 내용" 그대로 남아야 함
-PATCH http://localhost:3000/posts/6
-Content-Type: application/json
-
-{
-  "title": "제목만 바꿈"
+  "email": "test@test.com",
+  "password": "12345678"
 }
 
-### 없는 글 → 404
-PATCH http://localhost:3000/posts/9999
+### 이메일 형식 아님 → 400
+POST http://localhost:3001/users/signup
 Content-Type: application/json
 
 {
-  "title": "바뀐 제목"
+  "email": "abc",
+  "password": "12345678"
 }
 
-### 빈 제목 → 400
-PATCH http://localhost:3000/posts/6
+### 비밀번호 8자 미만 → 400
+POST http://localhost:3001/users/signup
 Content-Type: application/json
 
 {
-  "title": ""
+  "email": "new@test.com",
+  "password": "123"
 }

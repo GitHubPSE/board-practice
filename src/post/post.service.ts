@@ -9,7 +9,7 @@ import {Repository} from "typeorm";
 export class PostService {
     constructor(
         @InjectRepository(PostEntity)
-        private readonly postRepository: Repository<PostEntity>,
+        private readonly postRepository: Repository<PostEntity>
     ) {
         console.log('PostService 생성자 실행');
     }
