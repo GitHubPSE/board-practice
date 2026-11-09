@@ -1,124 +1,81 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# board-practice
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS를 처음 익히기 위해 만든 게시판 연습 프로젝트입니다. 게시글 CRUD와 회원가입 API를 직접 구현하면서 모듈, 의존성 주입, DTO 검증, TypeORM 사용법을 연습합니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 기술 스택
 
-## Description
+- NestJS 12, TypeScript
+- PostgreSQL, TypeORM
+- class-validator, class-transformer (요청 값 검증)
+- bcryptjs (비밀번호 해시)
+- Jest (테스트), oxlint, Prettier
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 구현한 기능
 
-## Project setup
+### 게시글 (`/posts`)
 
-```bash
-$ npm install
+- `GET /posts`: 전체 글 목록을 조회합니다.
+- `GET /posts/:id`: 글 하나를 조회합니다. 없으면 404를 돌려줍니다.
+- `POST /posts`: 글을 작성합니다. `title`, `content`는 빈 값을 허용하지 않습니다.
+- `PATCH /posts/:id`: 글을 수정합니다. 보낸 필드만 바꾸고, 보내지 않은 필드는 그대로 둡니다.
+- `DELETE /posts/:id`: 글을 삭제합니다.
+
+### 회원 (`/users`)
+
+- `POST /users/signup`: 회원가입을 처리합니다.
+  - 이메일 형식이 아니거나 비밀번호가 8자 미만이면 400을 돌려줍니다.
+  - 이미 가입된 이메일이면 409를 돌려줍니다.
+  - 비밀번호는 bcrypt로 해시해서 저장합니다. 응답에는 비밀번호를 넣지 않고 `id`, `email`, `createdAt`만 돌려줍니다.
+
+## 프로젝트 구조
+
+```
+src/
+├─ main.ts            # 앱 시작, 전역 ValidationPipe 등록
+├─ app.module.ts      # 환경 변수(ConfigModule)와 DB 연결(TypeORM) 설정
+├─ post/              # 게시글 모듈
+│  ├─ post.controller.ts
+│  ├─ post.service.ts
+│  ├─ post.entity.ts  # posts 테이블
+│  └─ dto/            # 작성·수정 요청 DTO
+└─ user/              # 회원 모듈
+   ├─ user.controller.ts
+   ├─ user.service.ts
+   ├─ user.entity.ts  # users 테이블 (email unique)
+   └─ dto/            # 가입 요청·응답 DTO
+test.http             # API 수동 테스트용 요청 모음
 ```
 
-## Compile and run the project
+## 실행 방법
+
+### 1. 준비
+
+- Node.js
+- 실행 중인 PostgreSQL과 사용할 데이터베이스
+
+### 2. 환경 변수 설정
+
+`.env.example`을 복사해 `.env`를 만들고 값을 채웁니다. `.env`는 Git에 올리지 않습니다.
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+- `DB_HOST`, `DB_PORT`: PostgreSQL 주소와 포트입니다.
+- `DB_USERNAME`, `DB_PASSWORD`: DB 계정입니다.
+- `DB_DATABASE`: 사용할 데이터베이스 이름입니다.
+- `PORT`: 서버 포트입니다. 키 자체가 없으면 3000을 씁니다.
+
+### 3. 설치와 실행
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
+npm run start:dev
 ```
 
-## Deployment
+TypeORM의 `synchronize: true` 설정 때문에 서버가 시작될 때 엔티티에 맞춰 테이블이 자동으로 만들어지거나 바뀝니다. 연습용 설정이므로 실제 서비스 DB에서는 쓰지 않습니다.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 테스트
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
-
-```bash
-$ npm install @nestjs/observe
-```
-
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- API 확인: `test.http`의 요청을 IntelliJ나 VS Code(REST Client 확장)에서 실행합니다. 정상 응답과 400·404·409 같은 실패 응답을 함께 확인할 수 있습니다.
+- 자동 테스트: `npm test` (단위), `npm run test:e2e` (e2e)
