@@ -43,8 +43,44 @@
 #  "title": ""
 #}
 
-### 가입 성공 → 201, 응답에 password 없어야 함
-POST http://localhost:3001/users/signup
+# ### 가입 성공 → 201, 응답에 password 없어야 함
+# POST http://localhost:3001/users/signup
+# Content-Type: application/json
+
+# {
+#   "email": "test@test.com",
+#   "password": "12345678"
+# }
+
+# ### 같은 이메일 다시 → 409
+# POST http://localhost:3001/users/signup
+# Content-Type: application/json
+
+# {
+#   "email": "test@test.com",
+#   "password": "12345678"
+# }
+
+# ### 이메일 형식 아님 → 400
+# POST http://localhost:3001/users/signup
+# Content-Type: application/json
+
+# {
+#   "email": "abc",
+#   "password": "12345678"
+# }
+
+# ### 비밀번호 8자 미만 → 400
+# POST http://localhost:3001/users/signup
+# Content-Type: application/json
+
+# {
+#   "email": "new@test.com",
+#   "password": "123"
+# }
+
+### 로그인 성공 → 201, 응답 헤더에 Set-Cookie
+POST http://localhost:3001/users/login
 Content-Type: application/json
 
 {
@@ -52,29 +88,11 @@ Content-Type: application/json
   "password": "12345678"
 }
 
-### 같은 이메일 다시 → 409
-POST http://localhost:3001/users/signup
+### 비밀번호 틀림 → 401
+POST http://localhost:3001/users/login
 Content-Type: application/json
 
 {
   "email": "test@test.com",
-  "password": "12345678"
-}
-
-### 이메일 형식 아님 → 400
-POST http://localhost:3001/users/signup
-Content-Type: application/json
-
-{
-  "email": "abc",
-  "password": "12345678"
-}
-
-### 비밀번호 8자 미만 → 400
-POST http://localhost:3001/users/signup
-Content-Type: application/json
-
-{
-  "email": "new@test.com",
-  "password": "123"
+  "password": "wrongpass"
 }
